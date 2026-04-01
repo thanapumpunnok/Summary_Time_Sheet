@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f0f4ff;
+      padding: 22px;
+      color: #1a1f36;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .header-icon {
+      width: 38px; height: 38px;
+      background: #1565C0;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .header-text h2 { font-size: 15px; font-weight: 700; color: #1a1f36; }
+    .header-text p  { font-size: 11px; color: #6b7399; margin-top: 1px; }
+
+    /* ── Card ── */
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(21,101,192,0.08);
+      margin-bottom: 14px;
+    }
+
+    /* ── Label ── */
+    label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7399;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* ── Select ── */
+    .select-wrap { position: relative; margin-bottom: 14px; }
+    select {
+      width: 100%;
+      padding: 11px 36px 11px 14px;
+      border: 1.5px solid #dde3f5;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1f36;
+      background: white;
+      appearance: none;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.15s;
+    }
+    select:focus { outline: none; border-color: #1565C0; }
+    .select-arrow {
+      position: absolute; right: 13px; top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none; color: #6b7399; font-size: 12px;
+    }
+
+    /* ── Cycle chip ── */
+    .cycle-chip {
+      background: #EEF2FF;
+      border: 1.5px solid #C7D2FE;
+      border-radius: 8px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .cycle-dot {
+      width: 8px; height: 8px;
+      background: #1565C0;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .cycle-label  { font-size: 12px; font-weight: 700; color: #1565C0; margin-bottom: 2px; }
+    .cycle-dates  { font-size: 11px; color: #4b5563; line-height: 1.5; }
+    .cycle-arrow  { font-size: 11px; color: #1565C0; font-weight: 700; margin: 0 4px; }
+
+    /* ── Button ── */
+    #createBtn {
+      width: 100%;
+      padding: 13px;
+      background: #1565C0;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 4px 14px rgba(21,101,192,0.30);
+    }
+    #createBtn:hover:not(:disabled) { background: #0d47a1; transform: translateY(-1px); }
+    #createBtn:active:not(:disabled){ transform: translateY(0); }
+    #createBtn:disabled { background: #9aa0a6; cursor: not-allowed; box-shadow: none; }
+
+    /* ── Loading ── */
+    #loading { display: none; text-align: center; padding: 30px 20px; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid #E8F0FE;
+      border-top-color: #1565C0;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading p { font-size: 13px; color: #6b7399; font-weight: 500; }
+
+    /* ── Result ── */
+    #result { display: none; }
+    .result-header {
+      background: linear-gradient(135deg, #1565C0, #1976D2);
+      border-radius: 12px;
+      padding: 22px 18px;
+      text-align: center;
+      margin-bottom: 14px;
+      color: white;
+    }
+    .result-header .check { font-size: 32px; margin-bottom: 8px; }
+    .result-header h3     { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+    .result-header p      { font-size: 11px; opacity: 0.8; }
+
+    .link-card {
+      background: white;
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 8px rgba(21,101,192,0.08);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .link-icon {
+      width: 36px; height: 36px;
+      background: #E8F0FE;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .link-info              { flex: 1; min-width: 0; }
+    .link-info .link-label  { font-size: 10px; color: #6b7399; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+    .link-info .link-name   { font-size: 12px; font-weight: 600; color: #1a1f36; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .open-btn {
+      padding: 8px 14px;
+      background: #1565C0;
+      color: white;
+      border: none;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .open-btn:hover { background: #0d47a1; }
+
+    .another-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 11px;
+      background: transparent;
+      color: #1565C0;
+      border: 1.5px solid #1565C0;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.15s;
+    }
+    .another-btn:hover { background: #EEF2FF; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-icon">📋</div>
+    <div class="header-text">
+      <h2>Employee Spreadsheet</h2>
+      <p>Select a work cycle to generate employee tabs</p>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div id="formSection">
+    <div class="card">
+      <label>📅 Work Cycle Month</label>
+      <div class="select-wrap">
+        <select id="monthSelect" onchange="updateCycle()"></select>
+        <span class="select-arrow">▼</span>
+      </div>
+      <label>Cycle Period</label>
+      <div class="cycle-chip">
+        <div class="cycle-dot"></div>
+        <div>
+          <div class="cycle-label" id="cycleLabel">—</div>
+          <div class="cycle-dates" id="cycleDates">Choose a month above</div>
+        </div>
+      </div>
+    </div>
+    <button id="createBtn" onclick="doCreate()">
+      🚀 Create Spreadsheet
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Creating spreadsheet, please wait…</p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result">
+    <div class="result-header">
+      <div class="check">✅</div>
+      <h3 id="resultTitle">Spreadsheet Created!</h3>
+      <p id="resultSub"></p>
+    </div>
+    <div class="link-card">
+      <div class="link-icon">📂</div>
+      <div class="link-info">
+        <div class="link-label">New Spreadsheet</div>
+        <div class="link-name" id="resultName">—</div>
+      </div>
+      <a id="resultLink" class="open-btn" href="#" target="_blank">Open ↗</a>
+    </div>
+    <button class="another-btn" onclick="resetForm()">← Create Another</button>
+  </div>
+
+  <script>
+    const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun',
+                    'Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    function populateMonths() {
+      const sel = document.getElementById('monthSelect');
+      const now = new Date();
+      const cm  = now.getMonth(), cy = now.getFullYear();
+
+      for (let i = -6; i <= 3; i++) {
+        let m = cm + i, y = cy;
+        while (m < 0)   { m += 12; y--; }
+        while (m >= 12) { m -= 12; y++; }
+        const opt   = document.createElement('option');
+        opt.value   = JSON.stringify({ month: m + 1, year: y });
+        opt.text    = MONTHS[m] + String(y).slice(2);
+        if (i === 0) opt.selected = true;
+        sel.appendChild(opt);
+      }
+      updateCycle();
+    }
+
+    function updateCycle() {
+      const { month, year } = JSON.parse(document.getElementById('monthSelect').value);
+      const { start, end } = getCycle(month, year);
+      document.getElementById('cycleLabel').textContent =
+        `${MONTHS[month - 1]}${String(year).slice(2)} Cycle`;
+      document.getElementById('cycleDates').innerHTML =
+        `<b>${fmt(start)}</b> <span class="cycle-arrow">→</span> <b>${fmt(end)}</b>`;
+    }
+
+    function getCycle(month, year) {
+      const sm = month === 1 ? 12 : month - 1;
+      const sy = month === 1 ? year - 1 : year;
+      return {
+        start: new Date(sy, sm - 1, 16),
+        end:   new Date(year, month - 1, 15)
+      };
+    }
+
+    function fmt(d) {
+      return `${String(d.getDate()).padStart(2,'0')} ${MONTHS[d.getMonth()]} ${String(d.getFullYear()).slice(2)}`;
+    }
+
+    function doCreate() {
+      const { month, year } = JSON.parse(document.getElementById('monthSelect').value);
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('loading').style.display     = 'block';
+      document.getElementById('result').style.display      = 'none';
+      document.getElementById('createBtn').disabled        = true;
+
+      google.script.run
+        .withSuccessHandler(onDone)
+        .withFailureHandler(onFail)
+        .runCreateScript(month, year);
+    }
+
+    function onDone(res) {
+      document.getElementById('loading').style.display = 'none';
+      if (res.success) {
+        document.getElementById('resultTitle').textContent = 'Spreadsheet Created!';
+        document.getElementById('resultSub').textContent   = `${res.count} employee tab(s) generated`;
+        document.getElementById('resultName').textContent  = res.name;
+        document.getElementById('resultLink').href         = res.url;
+        document.getElementById('result').style.display   = 'block';
+      } else {
+        alert('❌ Error: ' + res.error);
+        resetForm();
+      }
+    }
+
+    function onFail(err) {
+      document.getElementById('loading').style.display = 'none';
+      alert('❌ Script error: ' + err.message);
+      resetForm();
+    }
+
+    function resetForm() {
+      document.getElementById('result').style.display      = 'none';
+      document.getElementById('loading').style.display     = 'none';
+      document.getElementById('formSection').style.display = 'block';
+      document.getElementById('createBtn').disabled        = false;
+    }
+
+    populateMonths();
+  </script>
+</body>
+</html>
